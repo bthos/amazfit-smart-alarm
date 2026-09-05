@@ -108,8 +108,20 @@ rollup-bundles the 4 JS files, resizes/converts all PNGs (icon + slide-switch
 art) with PNG2TGA, compiles every page to QuickJS bytecode, and packages a
 `dist/*.zab` whose embedded `app.json` and `manifest.json` correctly report
 `screenResolution: "432x514"` / `deviceSource: 11206915` for the `bip_max`
-target - `zeus dev`/`zeus preview` were not exercised since they need a
-paired watch or the (GUI, account-gated) Zepp simulator, unavailable here.
+target.
+
+`zeus dev`/`zeus preview` were **not** exercised here - both need `zeus
+login` first, which opens `<LOGIN_URL>?...&project_redirect_uri=http://
+localhost:<port>/login/callback` in a browser and waits for *that same
+machine's* localhost callback server to receive the OAuth redirect. There's
+no browser/display in this environment, and the login can't be completed on
+a different machine either, since the callback is bound to whichever
+machine's `zeus login` opened it. `zeus preview` additionally needs the
+official (GUI, downloadable) Zepp OS Simulator app running and listening on
+`127.0.0.1:7650` (`zeus status` reports `simulator connect status:
+disconnected` otherwise). None of that is a code issue - run `zeus login`
+and `zeus preview`/`zeus dev` yourself once you have the Simulator installed
+and are logged into a Zepp developer account.
 
 **Offline/CI note:** `zeus build` needs `~/.zepp/.zeus_devices`, a cache of
 Zepp's device catalog it otherwise fetches from `upload-cdn.zepp.com`. If
@@ -126,6 +138,33 @@ apiLevelLimitMin}` and `value.pixelDensity` satisfies both. Also note
 package manager hoists it to the workspace root, add the same
 `_moduleAliases` entry to this project's `package.json` (already done here)
 so `zeppos-app-utils` still resolves.
+
+## Testing
+
+```bash
+npm test
+```
+
+There's no way to run the real Zepp OS runtime (or the GUI simulator) inside
+a plain Node/CI process, so `test/run.mjs` instead imports the actual
+`app.js`/`page/*.js`/`utils/*.js` source files - unmodified - into plain
+Node, against small hand-written mocks of the device APIs
+(`test/mocks/@zos/*`) and a `Page`/`App`/`getApp` global shim, wired up via
+a Node loader hook (`test/resolve-hook.mjs`, registered through
+`test/register.mjs`) that redirects `@zos/*` imports to those mocks and
+resolves the extensionless relative imports Zepp's own rollup-based bundler
+allows but Node's ESM resolver doesn't.
+
+It's 49 checks driving the app end to end at the logic/interaction level:
+`computeNextTimestamp`'s date math, rendering the alarm list (empty and
+populated), the whole create-alarm flow through `edit.page.js` (opening and
+completing the native `TIME_PICKER`, toggling a weekday button, flipping the
+`SLIDE_SWITCH` widgets, Save), an alarm firing and being dismissed or
+snoozed, both smart-wake branches (heart-rate rise vs. no rise) with the
+resulting native-timer arm/cancel calls, and delete. It will not catch
+device-specific rendering/layout issues - only the official simulator or a
+real watch can - but it does catch logic regressions and crashes across the
+whole codebase on every change, with no external dependencies.
 
 ## References
 

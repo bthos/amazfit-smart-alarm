@@ -6,7 +6,8 @@
     "dev": "zeus dev",
     "preview": "zeus preview",
     "build": "zeus build",
-    "doctor": "zeus doctor"
+    "doctor": "zeus doctor",
+    "test": "node --import ./test/register.mjs test/run.mjs"
   },
   "license": "MIT",
   "devDependencies": {
