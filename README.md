@@ -6,8 +6,9 @@ using the officially recommended `@zeppos/zeus-cli` toolchain and the modern
 
 ## What it does
 
-- Create, edit and delete alarms with a time, an optional repeat pattern
-  (any subset of Mon–Sun, or a one-off "once" alarm), and an on/off switch.
+- Create, edit and delete alarms with a native `TIME_PICKER`, an optional
+  repeat pattern (any subset of Mon–Sun, or a one-off "once" alarm), and a
+  native `SLIDE_SWITCH` on/off toggle.
 - **Smart Wake**: instead of always ringing at the exact minute, an alarm can
   define a wake *window* (10 / 20 / 30 minutes) before the target time.
   During that window the watch periodically checks the wearer's heart rate
@@ -32,8 +33,15 @@ utils/
   constants.js           # Colors, sizes, weekday labels, smart-wake tuning
   alarm-store.js         # @zos/storage-backed CRUD for the alarm list
   alarm-scheduler.js     # Computes fire times and drives @zos/alarm set()/cancel()
-assets/bip_max/icon.png  # App icon (placeholder - see below)
+assets/bip_max/           # icon.png + SLIDE_SWITCH track/knob art (placeholders - see below)
 ```
+
+## Native widgets used
+
+The UI is built entirely from `@zos/ui` widgets - no custom canvas drawing:
+`TIME_PICKER` (full-screen time selection), `SLIDE_SWITCH` (alarm on/off,
+Smart Wake on/off), `BUTTON` (all taps/navigation, including the weekday
+multi-select row), `TEXT` and `FILL_RECT`.
 
 ## How alarms are scheduled
 
@@ -71,8 +79,8 @@ relying on any single "smart alarm" primitive (Zepp OS doesn't have one).
   launch through a page. This is expected behavior, not a bug.
 - `app.json`'s `appId` (`1000001`) is a local placeholder - replace it with
   the ID assigned by the Zepp developer console before publishing.
-- `assets/bip_max/icon.png` is a small generated placeholder icon; swap in
-  real artwork before release.
+- `assets/bip_max/icon.png` and the `switch_*.png` slide-switch art are
+  small generated placeholders; swap in real artwork before release.
 - Targets only the Amazfit Bip Max (`deviceSource: 11206915`, API 4.0.4).
   Add more entries under `targets` in `app.json` to support other watches.
 
@@ -94,6 +102,30 @@ zeus dev          # start the dev server
 zeus preview      # QR-pair the Zepp app / simulator for live preview
 zeus build        # produce a distributable .zab package
 ```
+
+This has been verified end-to-end with `zeus build` (zeus-cli 1.9.3): it
+rollup-bundles the 4 JS files, resizes/converts all PNGs (icon + slide-switch
+art) with PNG2TGA, compiles every page to QuickJS bytecode, and packages a
+`dist/*.zab` whose embedded `app.json` and `manifest.json` correctly report
+`screenResolution: "432x514"` / `deviceSource: 11206915` for the `bip_max`
+target - `zeus dev`/`zeus preview` were not exercised since they need a
+paired watch or the (GUI, account-gated) Zepp simulator, unavailable here.
+
+**Offline/CI note:** `zeus build` needs `~/.zepp/.zeus_devices`, a cache of
+Zepp's device catalog it otherwise fetches from `upload-cdn.zepp.com`. If
+that host isn't reachable, seed the cache yourself before building - see the
+device object shape zeus-cli and its bundled `@zeppos/zpm` both expect in
+`config/device.js` and the `Be()` parser inside `@zeppos/zpm`'s bundle; a
+single entry for `deviceSource: 11206915` with `value.code`, numeric
+`value.productId`/`value.productVersion`, `value.shape`, `value.chip`,
+`value.screen.{size,previewSize,iconSize}`, `value.os.{version,apiLevel,
+apiLevelLimitMin}` and `value.pixelDensity` satisfies both. Also note
+`@zeppos/zeus-cli`'s `package.json` declares a `_moduleAliases` mapping
+(via the `module-alias` package) that only resolves correctly when
+`module-alias` itself lives in `zeus-cli`'s own `node_modules` - if your
+package manager hoists it to the workspace root, add the same
+`_moduleAliases` entry to this project's `package.json` (already done here)
+so `zeppos-app-utils` still resolves.
 
 ## References
 

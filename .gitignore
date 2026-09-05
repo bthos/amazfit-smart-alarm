@@ -36,6 +36,9 @@
 # --- Project (app) ---
 node_modules/
 coverage/
+dist/
+.zeus_env
+.zbs.log
 
 
 .specstory/

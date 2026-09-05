@@ -90,9 +90,8 @@ Page({
     )
   },
 
-  toggleEnabled() {
-    this.state.alarm.enabled = !this.state.alarm.enabled
-    this.render()
+  setEnabled(checked) {
+    this.state.alarm.enabled = checked
   },
 
   toggleDay(bitIndex) {
@@ -100,9 +99,45 @@ Page({
     this.render()
   },
 
-  toggleSmart() {
-    this.state.alarm.smart = !this.state.alarm.smart
+  setSmart(checked) {
+    this.state.alarm.smart = checked
     this.render()
+  },
+
+  /** A label + native SLIDE_SWITCH row. Returns the row height used. */
+  renderSwitchRow(y, labelText, checked, onChange) {
+    const h = 56
+    this.track(
+      createWidget(widget.TEXT, {
+        x: px(16),
+        y: px(y),
+        w: px(280),
+        h: px(h),
+        text: labelText,
+        text_size: px(28),
+        color: COLOR.text,
+        align_h: align.LEFT,
+        align_v: align.CENTER_V,
+        text_style: text_style.NONE,
+      })
+    )
+    this.track(
+      createWidget(widget.SLIDE_SWITCH, {
+        x: px(320),
+        y: px(y),
+        w: px(96),
+        h: px(56),
+        select_bg: 'switch_on.png',
+        un_select_bg: 'switch_off.png',
+        slide_src: 'switch_knob.png',
+        slide_select_x: px(44),
+        slide_un_select_x: px(4),
+        slide_y: px(4),
+        checked,
+        checked_change_func: (_widget, isChecked) => onChange(isChecked),
+      })
+    )
+    return h
   },
 
   cycleSmartWindow() {
@@ -189,21 +224,10 @@ Page({
     )
     y += 90 + 10
 
-    this.track(
-      createWidget(widget.BUTTON, {
-        x: px(16),
-        y: px(y),
-        w: px(400),
-        h: px(50),
-        radius: px(14),
-        normal_color: alarm.enabled ? COLOR.primaryDim : COLOR.surface,
-        press_color: COLOR.border,
-        text: `Alarm: ${alarm.enabled ? 'On' : 'Off'}`,
-        text_size: px(26),
-        click_func: () => this.toggleEnabled(),
-      })
+    y += this.renderSwitchRow(y, 'Alarm enabled', alarm.enabled, (checked) =>
+      this.setEnabled(checked)
     )
-    y += 50 + 12
+    y += 12
 
     const dayW = 52
     const dayGap = 6
@@ -226,21 +250,10 @@ Page({
     })
     y += 52 + 12
 
-    this.track(
-      createWidget(widget.BUTTON, {
-        x: px(16),
-        y: px(y),
-        w: px(400),
-        h: px(54),
-        radius: px(16),
-        normal_color: alarm.smart ? COLOR.primaryDim : COLOR.surface,
-        press_color: COLOR.border,
-        text: `Smart Wake: ${alarm.smart ? 'On' : 'Off'}`,
-        text_size: px(28),
-        click_func: () => this.toggleSmart(),
-      })
+    y += this.renderSwitchRow(y, 'Smart Wake', alarm.smart, (checked) =>
+      this.setSmart(checked)
     )
-    y += 54 + 10
+    y += 10
 
     if (alarm.smart) {
       this.track(
