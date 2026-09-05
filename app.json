@@ -1,0 +1,54 @@
+{
+  "configVersion": "v2",
+  "app": {
+    "appId": 1000001,
+    "appName": "Smart Alarm",
+    "appType": "app",
+    "version": {
+      "code": 1,
+      "name": "1.0.0"
+    },
+    "icon": "icon.png",
+    "vender": "amazfit-smart-alarm",
+    "description": "A smart alarm clock with a light-sleep-aware wake window, built for the Amazfit Bip Max on Zepp OS."
+  },
+  "permissions": [
+    "device:os.alarm",
+    "device:os.local_storage",
+    "data:os.device.info",
+    "data:user.hd.heart_rate"
+  ],
+  "runtime": {
+    "apiVersion": {
+      "compatible": "3.6",
+      "target": "4.0",
+      "minVersion": "3.6"
+    }
+  },
+  "targets": {
+    "bip_max": {
+      "module": {
+        "page": {
+          "pages": [
+            "page/index.page",
+            "page/edit.page",
+            "page/ring.page"
+          ]
+        }
+      },
+      "platforms": [
+        {
+          "name": "bip_max",
+          "deviceSource": 11206915
+        }
+      ],
+      "designWidth": 432
+    }
+  },
+  "i18n": {
+    "en-US": {
+      "appName": "Smart Alarm"
+    }
+  },
+  "defaultLanguage": "en-US"
+}

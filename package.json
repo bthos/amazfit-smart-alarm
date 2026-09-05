@@ -1,0 +1,15 @@
+{
+  "name": "amazfit-smart-alarm",
+  "version": "1.0.0",
+  "description": "Smart Alarm mini-program for Amazfit Bip Max, built on Zepp OS.",
+  "scripts": {
+    "dev": "zeus dev",
+    "preview": "zeus preview",
+    "build": "zeus build",
+    "doctor": "zeus doctor"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@zeppos/zeus-cli": "^2.0.0"
+  }
+}
