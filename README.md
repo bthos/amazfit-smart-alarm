@@ -77,8 +77,8 @@ relying on any single "smart alarm" primitive (Zepp OS doesn't have one).
 - A smart-wake check very briefly wakes the screen every ~2 minutes during
   the window even when it doesn't trigger a ring, since `@zos/alarm` timers
   launch through a page. This is expected behavior, not a bug.
-- `app.json`'s `appId` (`1000001`) is a local placeholder - replace it with
-  the ID assigned by the Zepp developer console before publishing.
+- `app.json`'s `appId` (`1124567`) is the ID assigned in the Zepp developer
+  console for this app.
 - `assets/bip_max/icon.png` and the `switch_*.png` slide-switch art are
   small generated placeholders; swap in real artwork before release.
 - Targets only the Amazfit Bip Max (`deviceSource: 11206915`, API 4.0.4).
